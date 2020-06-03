@@ -44,7 +44,7 @@ import torch
 
 from .superpoint import SuperPoint
 from .superglue import SuperGlue
-
+import time
 
 class Matching(torch.nn.Module):
     """ Image Matching Frontend (SuperPoint + SuperGlue) """
@@ -62,13 +62,15 @@ class Matching(torch.nn.Module):
         pred = {}
 
         # Extract SuperPoint (keypoints, scores, descriptors) if not provided
+        start = time.time()
         if 'keypoints0' not in data:
             pred0 = self.superpoint({'image': data['image0']})
             pred = {**pred, **{k+'0': v for k, v in pred0.items()}}
         if 'keypoints1' not in data:
             pred1 = self.superpoint({'image': data['image1']})
             pred = {**pred, **{k+'1': v for k, v in pred1.items()}}
-
+        print("time deep descriptors {}".format(time.time()-start))
+        start = time.time()
         # Batch all features
         # We should either have i) one image per batch, or
         # ii) the same number of local features for all images in the batch.
@@ -80,5 +82,6 @@ class Matching(torch.nn.Module):
 
         # Perform the matching
         pred = {**pred, **self.superglue(data)}
+        print("time superglue network {}".format(time.time()-start))
 
         return pred
