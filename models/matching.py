@@ -69,7 +69,7 @@ class Matching(torch.nn.Module):
         if 'keypoints1' not in data:
             pred1 = self.superpoint({'image': data['image1']})
             pred = {**pred, **{k+'1': v for k, v in pred1.items()}}
-        print("time deep descriptors {}".format(time.time()-start))
+        #print("time deep descriptors {}".format(time.time()-start))
         start = time.time()
         # Batch all features
         # We should either have i) one image per batch, or
@@ -82,6 +82,6 @@ class Matching(torch.nn.Module):
 
         # Perform the matching
         pred = {**pred, **self.superglue(data)}
-        print("time superglue network {}".format(time.time()-start))
+        #print("time superglue network {}".format(time.time()-start))
 
         return pred
